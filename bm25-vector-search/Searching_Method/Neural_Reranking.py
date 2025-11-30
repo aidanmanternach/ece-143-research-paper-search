@@ -40,22 +40,25 @@ def cross_encoder_score(query, doc, tokenizer, model):
 
   with torch.no_grad():
     outputs = model(**encoded)
-  logits = outputs.logits[:, 1].squeeze(-1)  # [1] -> scalar
+  logits = outputs.logits.squeeze(-1)  # [1] -> scalar
   return float(logits.item())
 
 
 def rerank_with_cross_encoder(query, candidates, tokenizer, model):
   """
-  Rerank the candidate documents with a cross-encoder.
+  Rerank the candidate documents with a cross-encoder and return by index.
   """
   scored = []
-  for doc in candidates:
+  for idx,doc in candidates.itertuples():
     score = cross_encoder_score(query, doc, tokenizer, model)
-    scored.append((score, doc))
+    scored.append((score, idx))
   ranked = sorted(scored, key=lambda x: x[0], reverse=True)
-  return ranked
+  return [i for _,i in ranked]
 
-def retrieve_and_rerank(query, candidates,  tokenizer_model =  "bert-base-uncased", cross_encoder_model = "bert-base-uncased", top_k=100, final_k=10):
+def retrieve_and_rerank(query, candidates, 
+                        tokenizer_model =  "cross-encoder/ms-marco-MiniLM-L6-v2",
+                        cross_encoder_model = "cross-encoder/ms-marco-MiniLM-L6-v2",
+                        final_k=10):
   """
   Rerank using cross-encoder and return final_k best docs.
   """
