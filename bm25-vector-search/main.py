@@ -72,17 +72,23 @@ if __name__ == '__main__':
     #  Neural Reranking with Cross-Encoders
     print("Using Corss Encode to reranking top 100 files")
     candidates = combined_ranking(query, 100, title_term_table, abstract_term_table, title_lengths, abstract_lengths, avg_doc_len_title, avg_doc_len_abs, N, model, document_embeddings)
-    
+   
+    candidates_with_text = []
+    # put in the text to rerank 
+    for doc_id, score in candidates:
+        abstract = df.iloc[doc_id].get("abstract", "")
+        title    = df.iloc[doc_id].get("title", "")
+        text     = title + " " + abstract            
+        candidates_with_text.append((doc_id, text))
 
     reranked = retrieve_and_rerank(
         query,
-        candidates,
+        candidates_with_text,
         tokenizer_model = "bert-base-uncased",
         cross_encoder_model = "bert-base-uncased"
     )
 
     paper_idx = [s[1] for s in reranked[:5]]
-    scores = [s[0] for s in reranked[:5]]
 
     res_df = df.iloc[paper_idx]
 
@@ -91,5 +97,4 @@ if __name__ == '__main__':
         print(f"{i}. {r['title']}")
         print(f"\thttps://arxiv.org/pdf/{r['id']}.pdf")
         print(f"\t{r['update_date']}\n")
-        print(f"scores:{scores[i-1]}")
         i += 1
