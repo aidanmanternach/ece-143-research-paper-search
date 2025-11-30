@@ -81,7 +81,9 @@ if __name__ == '__main__':
         cross_encoder_model = "bert-base-uncased"
     )
 
-    paper_idx = [s[0] for s in reranked[:5]]
+    paper_idx = [s[1] for s in reranked[:5]]
+    scores = [s[0] for s in reranked[:5]]
+
     res_df = df.iloc[paper_idx]
 
     i = 1
@@ -89,4 +91,5 @@ if __name__ == '__main__':
         print(f"{i}. {r['title']}")
         print(f"\thttps://arxiv.org/pdf/{r['id']}.pdf")
         print(f"\t{r['update_date']}\n")
+        print(f"scores:{scores[i-1]}")
         i += 1
