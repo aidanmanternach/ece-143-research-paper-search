@@ -49,9 +49,9 @@ def rerank_with_cross_encoder(query, candidates, tokenizer, model):
   Rerank the candidate documents with a cross-encoder.
   """
   scored = []
-  for doc in candidates:
+  for idx, doc in candidates:
     score = cross_encoder_score(query, doc, tokenizer, model)
-    scored.append((score, doc))
+    scored.append((score, idx, doc))
   ranked = sorted(scored, key=lambda x: x[0], reverse=True)
   return ranked
 
