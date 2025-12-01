@@ -13,7 +13,7 @@ Given a text query, the pipeline returns relevant papers ranked by semantic simi
 
 ## File Structure
 
-.
+```plaintext
 ├── main.py                       # Program entry - runs all 3 retrieval levels
 ├── Preprocess.py                 # Data loading + preprocessing functions
 ├── Searching_Method/
@@ -44,7 +44,7 @@ Run a query from terminal
 python main.py search "attention mechanism"
 Example console output:
 
-
+```plaintext
 Level 1: TF-IDF results
 Level 2: BM25 + Embedding results
 Level 3: Cross-Encoder reranked results
@@ -53,7 +53,7 @@ The top results from all three retrieval modules will be displayed.
 ## Third-Party Dependencies
 External packages used in the system:
 
-
+```plaintext
 pandas
 numpy
 matplotlib
