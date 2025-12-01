@@ -25,18 +25,19 @@ Given a text query, the pipeline returns relevant papers ranked by semantic simi
 ├── visualization.ipynb           # Optional notebook for result analysis
 └── requirements.txt              # Dependency list
 ```
-Dataset Description
+Dataset Description  
 The system uses the following dataset:
 
 https://www.kaggle.com/datasets/Cornell-University/arxiv/data
+
 From this dataset, only samples with:
 
 category containing: "cs.ai"
-are extracted and processed into a .json.gz form before retrieval.
+
+are extracted and processed into a `.json.gz` file before retrieval.
 Relevant fields retained:
 
 
-id, authors, title, update_date, categories, abstract
 
 
 ## How to Run
