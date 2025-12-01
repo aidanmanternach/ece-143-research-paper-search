@@ -6,7 +6,7 @@ from nltk.stem import SnowballStemmer
 from Preprocess import load_df, load_pickle, load_pickle_files,prep_query
 from Searching_Method.Neural_Reranking import retrieve_and_rerank
 from Searching_Method.BM25andDenseEmbeddings import load_split_embeddings, combined_ranking
-
+from Searching_Method.TFIDF import TFIDF
 if __name__ == '__main__':
     # preprocess
     if not (len(sys.argv) > 2 and sys.argv[1] == 'search'):
@@ -44,7 +44,26 @@ if __name__ == '__main__':
 
     stemmer = SnowballStemmer('english')
 
-    # BM25 Configuration Variables
+    print('Loading Embedding Model...')
+    model = SentenceTransformer('all-MiniLM-L6-v2')
+
+    raw_query = sys.argv[2]
+    print(f'\nQuery: {raw_query}')
+
+    query = prep_query(raw_query, stop_words, stemmer)
+
+
+    # level 1 : TF-IDF
+    print('Level 1 : TF-IDF model ')
+    tfidf_model = TFIDF(df)
+    tfidf_results_df, _ = tfidf_model.search_papers(raw_query, top_n=5)
+    for i, (_, row) in enumerate(tfidf_results_df.iterrows(), start=1):
+        print(f"{i}. {row['title']}")
+        print(f"\thttps://arxiv.org/pdf/{row['id']}.pdf")
+        print(f"\t{row['update_date']} (TF-IDF score: {row['relevance_score']:.4f})\n")
+
+    # level 2 : BM25 Configuration Variables
+    print('Level 2 : BM25 with TF-IDF model ')
     N = len(title_lengths)
     avg_doc_len_title = sum(title_lengths.values()) / N
     avg_doc_len_abs = sum(abstract_lengths.values()) / N
@@ -52,13 +71,7 @@ if __name__ == '__main__':
     # Load the split embedding files
     document_embeddings = load_split_embeddings(path)
 
-    print('Loading Embedding Model...')
-    model = SentenceTransformer('all-MiniLM-L6-v2')
-
-    query = sys.argv[2]
-    print(f'\nQuery: {query}')
-
-    query = prep_query(query, stop_words, stemmer)
+    
     combined_res = combined_ranking(query, 5, title_term_table, abstract_term_table, title_lengths, abstract_lengths, avg_doc_len_title, avg_doc_len_abs, N, model, document_embeddings)
     paper_idx = [s[0] for s in combined_res]
     res_df = df.iloc[paper_idx]
@@ -69,8 +82,8 @@ if __name__ == '__main__':
         print(f"\t{r['update_date']}\n")
         i += 1
 
-    #  Neural Reranking with Cross-Encoders
-    print("Using Corss Encode to reranking top 100 files")
+    #  level 3 : Neural Reranking with Cross-Encoders
+    print("Level 3 : Neural Reranking with Cross-Encoders")
     candidates = combined_ranking(query, 100, title_term_table, abstract_term_table, title_lengths, abstract_lengths, avg_doc_len_title, avg_doc_len_abs, N, model, document_embeddings)
    
     candidates_with_text = []
