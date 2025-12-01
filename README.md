@@ -24,6 +24,7 @@ Given a text query, the pipeline returns relevant papers ranked by semantic simi
 ├── data-preparation/             # Scripts and steps used to filter raw dataset
 ├── visualization.ipynb           # Optional notebook for result analysis
 └── requirements.txt              # Dependency list
+```
 Dataset Description
 The system uses the following dataset:
 
@@ -48,6 +49,7 @@ Example console output:
 Level 1: TF-IDF results
 Level 2: BM25 + Embedding results
 Level 3: Cross-Encoder reranked results
+```
 The top results from all three retrieval modules will be displayed.
 
 ## Third-Party Dependencies
@@ -69,3 +71,4 @@ json (built-in)
 Install via:
 
 pip install -r requirements.txt
+```
