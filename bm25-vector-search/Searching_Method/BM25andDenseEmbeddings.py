@@ -186,7 +186,39 @@ def load_split_embeddings(path, pattern='document_embedding_part*.npz'):
         chunks.append(data['embeddings'])
     
     return np.concatenate(chunks, axis=0)
+
 def bm25_search(query, titles_bm25, abstracts_bm25,  top_k=5):
+    """
+    Perform a BM25 search over titles and abstracts and return ranked document indices.
+
+    This function queries two BM25 indexes—one for titles and one for abstracts—
+    then combines their scores (with a higher weight on titles), ranks documents,
+    and returns the indices of the top results.
+
+    Parameters
+    ----------
+    query : str
+        Search query string. It is lowercased and tokenized by simple space splitting.
+    titles_bm25 : object
+        BM25 index object for titles, expected to implement a `get_scores(query_tokens)` method.
+    abstracts_bm25 : object
+        BM25 index object for abstracts, expected to implement a `get_scores(query_tokens)` method.
+    top_k : int or str, optional
+        Number of top results to return. If `"all"`, all documents are returned.
+        Default is 5.
+
+    Returns
+    -------
+    list of int
+        List of document indices ordered by relevance score (highest first).
+
+    Notes
+    -----
+    The combined score is computed as:
+        combined = title_score * 4 + abstract_score
+    giving titles a stronger influence in ranking.
+    """
+
     query = query.lower().split(' ')
 
     titles_scores = titles_bm25.get_scores(query)
@@ -202,7 +234,36 @@ def bm25_search(query, titles_bm25, abstracts_bm25,  top_k=5):
         papers_idx = [s[1] for s in sorted_scores[:top_k]]  
 
     return papers_idx
+
+
 def clickable(df):
+    """
+    Convert rows of a DataFrame into clickable HTML-style arXiv links.
+
+    Each row must contain at least:
+    - 'id'  : arXiv identifier
+    - 'title' : paper title
+    - 'update_date' : last update date
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        DataFrame containing search results with arXiv metadata.
+
+    Returns
+    -------
+    list of str
+        A list of HTML strings where each entry consists of:
+        - a clickable link to the paper’s PDF on arXiv
+        - the paper title
+        - the update date (displayed below the link)
+
+    Example
+    -------
+    Returned HTML string format:
+        '<a href="https://arxiv.org/pdf/XXXX.XXXXX.pdf">Title</a><br>2024-05-12'
+    """
+
     search_res = []
     for _, row in df.iterrows():
         search_res.append(f'<a href="https://arxiv.org/pdf/{row['id']}.pdf">{row['title']}</a><br>{row['update_date']}')
