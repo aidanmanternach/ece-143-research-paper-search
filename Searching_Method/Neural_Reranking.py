@@ -78,8 +78,15 @@ def cross_encoder_score(query, doc, tokenizer, model):
 
     with torch.no_grad():
         outputs = model(**encoded)
-    logits = outputs.logits.squeeze(-1)  # [1] -> scalar
-    return float(logits.item())
+        logits = outputs.logits 
+
+    if logits.shape[-1] == 1:
+        score = logits.squeeze().item()
+    else:
+        # Binary classification: use logit of "positive" class (index 1)
+        score = logits[0, 1].item()
+
+    return float(score)
 
 
 def rerank_with_cross_encoder(query, candidates, tokenizer, model):
