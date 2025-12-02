@@ -23,7 +23,8 @@ Given a text query, the pipeline returns relevant papers ranked by semantic simi
 ├── data/                         # Processed metadata + embeddings
 ├── data-preparation/             # Scripts and steps used to filter raw dataset
 ├── visualization.ipynb           # Optional notebook for result analysis
-└── requirements.txt              # Dependency list
+├── requirements.txt              # Dependency list
+└── .gitignore                    # Exclusion list for git tracking
 ```
 
 ## Dataset Description
