@@ -25,7 +25,9 @@ Given a text query, the pipeline returns relevant papers ranked by semantic simi
 ├── visualization.ipynb           # Optional notebook for result analysis
 └── requirements.txt              # Dependency list
 ```
-Dataset Description  
+
+## Dataset Description
+
 The system uses the following dataset:
 
 https://www.kaggle.com/datasets/Cornell-University/arxiv/data
@@ -37,10 +39,8 @@ category containing: "cs.ai"
 are extracted and processed into a `.json.gz` file before retrieval.
 Relevant fields retained:
 
-
-
-
 ## How to Run
+
 Run a query from terminal
 
 python main.py search "attention mechanism"
@@ -51,9 +51,11 @@ Level 1: TF-IDF results
 Level 2: BM25 + Embedding results
 Level 3: Cross-Encoder reranked results
 ```
+
 The top results from all three retrieval modules will be displayed.
 
 ## Third-Party Dependencies
+
 External packages used in the system:
 
 ```plaintext
@@ -69,7 +71,10 @@ tqdm
 gzip (built-in)
 pickle (built-in)
 json (built-in)
-Install via:
+```
 
+**Install via:**
+
+```bash
 pip install -r requirements.txt
 ```
