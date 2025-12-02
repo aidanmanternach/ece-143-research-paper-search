@@ -30,13 +30,10 @@ Given a text query, the pipeline returns relevant papers ranked by semantic simi
 
 The system uses the following dataset:
 
-https://www.kaggle.com/datasets/Cornell-University/arxiv/data
+- [arXiv Dataset](https://www.kaggle.com/datasets/Cornell-University/arxiv/data)
 
-From this dataset, only samples with:
+From this dataset, only samples with category containing: `cs.ai` are extracted and processed into a `.json.gz` file before retrieval.
 
-category containing: "cs.ai"
-
-are extracted and processed into a `.json.gz` file before retrieval.
 Relevant fields retained:
 
 ## How to Run
