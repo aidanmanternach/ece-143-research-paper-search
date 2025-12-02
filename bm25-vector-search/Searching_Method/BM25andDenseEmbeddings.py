@@ -186,3 +186,25 @@ def load_split_embeddings(path, pattern='document_embedding_part*.npz'):
         chunks.append(data['embeddings'])
     
     return np.concatenate(chunks, axis=0)
+def bm25_search(query, titles_bm25, abstracts_bm25,  top_k=5):
+    query = query.lower().split(' ')
+
+    titles_scores = titles_bm25.get_scores(query)
+    abstract_scores = abstracts_bm25.get_scores(query)
+
+    indexed_scores = [(t_s * 4 + a_s, idx) for idx, (t_s, a_s) in enumerate(zip(titles_scores, abstract_scores))]
+
+    sorted_scores = sorted(indexed_scores, reverse=True)
+
+    if top_k == 'all':
+        papers_idx = [s[1] for s in sorted_scores]          
+    else:
+        papers_idx = [s[1] for s in sorted_scores[:top_k]]  
+
+    return papers_idx
+def clickable(df):
+    search_res = []
+    for _, row in df.iterrows():
+        search_res.append(f'<a href="https://arxiv.org/pdf/{row['id']}.pdf">{row['title']}</a><br>{row['update_date']}')
+
+    return search_res
