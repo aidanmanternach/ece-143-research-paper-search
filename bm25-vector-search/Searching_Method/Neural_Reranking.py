@@ -49,11 +49,11 @@ def rerank_with_cross_encoder(query, candidates, tokenizer, model):
   Rerank the candidate documents with a cross-encoder and return by index.
   """
   scored = []
-  for idx,doc in candidates.itertuples():
+  for idx,doc in candidates:
     score = cross_encoder_score(query, doc, tokenizer, model)
     scored.append((score, idx))
   ranked = sorted(scored, key=lambda x: x[0], reverse=True)
-  return [i for _,i in ranked]
+  return ranked
 
 def retrieve_and_rerank(query, candidates, 
                         tokenizer_model =  "cross-encoder/ms-marco-MiniLM-L6-v2",
