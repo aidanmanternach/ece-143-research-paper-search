@@ -4,11 +4,72 @@ from sklearn.metrics.pairwise import cosine_similarity
 import glob
 
 def bm25(df, tf, dl, avg_dl, N):
+    """
+    Compute the BM25 score for a single term in a single document.
+
+    Parameters
+    ----------
+    df : int
+        Document frequency of the term (number of documents containing the term).
+    tf : int or float
+        Term frequency within the document.
+    dl : int or float
+        Length of the document.
+    avg_dl : float
+        Average document length across the corpus.
+    N : int
+        Total number of documents in the corpus.
+
+    Returns
+    -------
+    float
+        The BM25 relevance score for the term in the document.
+    """
+
     k=1.2
     b=0.75
     return np.log((N/df) + 1) * (tf * (k + 1)) / (tf + k * (1 - b + (dl / avg_dl)))
 
-def bm25_rankings(query, num_res, title_term_table, abstract_term_table, title_lengths, abstract_lengths, avg_doc_len_title, avg_doc_len_abs, N):
+def bm25_rankings(query,
+                  num_res,
+                  title_term_table,
+                  abstract_term_table,
+                  title_lengths,
+                  abstract_lengths,
+                  avg_doc_len_title,
+                  avg_doc_len_abs,
+                  N):
+    """
+    Compute BM25-based rankings for documents given a query, using both title and abstract fields.
+
+    Parameters
+    ----------
+    query : str
+        The input search query (space-separated terms).
+    num_res : int
+        Number of top results to return.
+    title_term_table : dict
+        Mapping term -> list of (doc_id, term_frequency) for titles.
+    abstract_term_table : dict
+        Mapping term -> list of (doc_id, term_frequency) for abstracts.
+    title_lengths : list or array
+        Document lengths for title fields.
+    abstract_lengths : list or array
+        Document lengths for abstract fields.
+    avg_doc_len_title : float
+        Average title length across all documents.
+    avg_doc_len_abs : float
+        Average abstract length across all documents.
+    N : int
+        Total number of documents.
+
+    Returns
+    -------
+    list of (int, float)
+        Sorted list of `(doc_id, score)` pairs, highest score first. If fewer than
+        `num_res` documents are scored, all results are returned.
+    """
+
     title_weight = 0.5 # term appearing in title has more importance
     doc_scores = defaultdict(int)
     for term in query.split():
@@ -26,7 +87,58 @@ def bm25_rankings(query, num_res, title_term_table, abstract_term_table, title_l
 
     return ranked_docs[:num_res]
 
-def combined_ranking(query, num_res, title_term_table, abstract_term_table, title_lengths, abstract_lengths, avg_doc_len_title, avg_doc_len_abs, N, model, document_embeddings, bm25_weight = 0.3, vector_weight=0.7):
+def combined_ranking(query, 
+                     num_res, 
+                     title_term_table,
+                     abstract_term_table,
+                     title_lengths,
+                     abstract_lengths,
+                     avg_doc_len_title,
+                     avg_doc_len_abs,
+                     N,
+                     model,
+                     document_embeddings,
+                     bm25_weight = 0.3,
+                     vector_weight=0.7
+                    ):
+    """
+    Combine BM25 scores and embedding-based semantic similarity to rank documents.
+
+    Parameters
+    ----------
+    query : str
+        Input search query.
+    num_res : int
+        Number of top results to return.
+    title_term_table : dict
+        Mapping term -> list of (doc_id, term_frequency) for titles.
+    abstract_term_table : dict
+        Mapping term -> list of (doc_id, term_frequency) for abstracts.
+    title_lengths : list or array
+        Document lengths for title fields.
+    abstract_lengths : list or array
+        Document lengths for abstract fields.
+    avg_doc_len_title : float
+        Average title length across documents.
+    avg_doc_len_abs : float
+        Average abstract length across documents.
+    N : int
+        Total number of documents.
+    model : sentence-transformers model or similar
+        Model used to encode the query into an embedding.
+    document_embeddings : array-like, shape (num_docs, emb_dim)
+        Precomputed embeddings for all documents.
+    bm25_weight : float, optional
+        Weight assigned to normalized BM25 scores (default: 0.3).
+    vector_weight : float, optional
+        Weight assigned to embedding similarity scores (default: 0.7).
+
+    Returns
+    -------
+    list of (int, float)
+        Top-ranked documents as `(doc_id, score)` pairs sorted by combined relevance.
+    """
+    
     bm25_res = bm25_rankings(query, num_res * 5, title_term_table, abstract_term_table, title_lengths, abstract_lengths, avg_doc_len_title, avg_doc_len_abs, N)
 
     bm25_scores = {doc_id: score for doc_id, score in bm25_res}
@@ -50,6 +162,22 @@ def combined_ranking(query, num_res, title_term_table, abstract_term_table, titl
     return top_res
 
 def load_split_embeddings(path, pattern='document_embedding_part*.npz'):
+    """
+    Load and concatenate multiple embedding files saved in `.npz` parts.
+
+    Parameters
+    ----------
+    path : str
+        Directory containing the embedding part files.
+    pattern : str, optional
+        Glob pattern for selecting embedding files (default: 'document_embedding_part*.npz').
+
+    Returns
+    -------
+    numpy.ndarray
+        A single concatenated array of document embeddings.
+    """
+
     files = sorted(glob.glob(path + pattern))
     
     chunks = []
