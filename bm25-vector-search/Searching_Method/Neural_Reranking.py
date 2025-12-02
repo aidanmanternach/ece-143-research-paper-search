@@ -50,9 +50,9 @@ def cross_encoder_score(query, doc, tokenizer, model):
 
     Parameters
     ----------
-    query : str or any
+    query : str
         The query text. Passed through `normalize_text`.
-    doc : str or any
+    doc : str
         The document text. Passed through `normalize_text`.
     tokenizer : PreTrainedTokenizer
         HuggingFace tokenizer used to encode the query-document pair.
@@ -91,9 +91,9 @@ def rerank_with_cross_encoder(query, candidates, tokenizer, model):
 
     Parameters
     ----------
-    query : str or any
+    query : str
         The search query.
-    candidates : list of (int, any)
+    candidates : list of (int, str)
         A list of `(doc_id, document_content)` pairs to rerank.
     tokenizer : PreTrainedTokenizer
         Tokenizer for encoding query-document pairs.
@@ -113,10 +113,13 @@ def rerank_with_cross_encoder(query, candidates, tokenizer, model):
     ranked = sorted(scored, key=lambda x: x[0], reverse=True)
     return ranked
 
-def retrieve_and_rerank(query, candidates, 
-                        tokenizer_model =  "cross-encoder/ms-marco-MiniLM-L6-v2",
-                        cross_encoder_model = "cross-encoder/ms-marco-MiniLM-L6-v2",
-                        final_k=10):
+def retrieve_and_rerank(
+        query,
+        candidates, 
+        tokenizer_model =  "cross-encoder/ms-marco-MiniLM-L6-v2",
+        cross_encoder_model = "cross-encoder/ms-marco-MiniLM-L6-v2",
+        final_k=10
+    ):
     """
     Load a Cross-Encoder model and rerank candidate documents for a query.
 
@@ -127,7 +130,7 @@ def retrieve_and_rerank(query, candidates,
     ----------
     query : str or any
         The query to evaluate.
-    candidates : list of (int, any)
+    candidates : list of (int, str)
         Candidate documents as `(doc_id, document_content)` tuples.
     tokenizer_model : str, optional
         HuggingFace model name or path for the tokenizer.

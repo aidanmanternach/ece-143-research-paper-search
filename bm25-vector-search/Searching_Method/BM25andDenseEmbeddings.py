@@ -30,15 +30,17 @@ def bm25(df, tf, dl, avg_dl, N):
     b=0.75
     return np.log((N/df) + 1) * (tf * (k + 1)) / (tf + k * (1 - b + (dl / avg_dl)))
 
-def bm25_rankings(query,
-                  num_res,
-                  title_term_table,
-                  abstract_term_table,
-                  title_lengths,
-                  abstract_lengths,
-                  avg_doc_len_title,
-                  avg_doc_len_abs,
-                  N):
+def bm25_rankings(
+        query,
+        num_res,
+        title_term_table,
+        abstract_term_table,
+        title_lengths,
+        abstract_lengths,
+        avg_doc_len_title,
+        avg_doc_len_abs,
+        N
+    ):
     """
     Compute BM25-based rankings for documents given a query, using both title and abstract fields.
 
@@ -87,20 +89,21 @@ def bm25_rankings(query,
 
     return ranked_docs[:num_res]
 
-def combined_ranking(query, 
-                     num_res, 
-                     title_term_table,
-                     abstract_term_table,
-                     title_lengths,
-                     abstract_lengths,
-                     avg_doc_len_title,
-                     avg_doc_len_abs,
-                     N,
-                     model,
-                     document_embeddings,
-                     bm25_weight = 0.3,
-                     vector_weight=0.7
-                    ):
+def combined_ranking(
+        query, 
+        num_res, 
+        title_term_table,
+        abstract_term_table,
+        title_lengths,
+        abstract_lengths,
+        avg_doc_len_title,
+        avg_doc_len_abs,
+        N,
+        model,
+        document_embeddings,
+        bm25_weight = 0.3,
+        vector_weight=0.7
+    ):
     """
     Combine BM25 scores and embedding-based semantic similarity to rank documents.
 
@@ -139,7 +142,16 @@ def combined_ranking(query,
         Top-ranked documents as `(doc_id, score)` pairs sorted by combined relevance.
     """
     
-    bm25_res = bm25_rankings(query, num_res * 5, title_term_table, abstract_term_table, title_lengths, abstract_lengths, avg_doc_len_title, avg_doc_len_abs, N)
+    bm25_res = bm25_rankings(
+        query,num_res * 5,
+        title_term_table,
+        abstract_term_table,
+        title_lengths,
+        abstract_lengths,
+        avg_doc_len_title,
+        avg_doc_len_abs,
+        N
+    )
 
     bm25_scores = {doc_id: score for doc_id, score in bm25_res}
 
@@ -187,7 +199,7 @@ def load_split_embeddings(path, pattern='document_embedding_part*.npz'):
     
     return np.concatenate(chunks, axis=0)
 
-def bm25_search(query, titles_bm25, abstracts_bm25,  top_k=5):
+def bm25_search(query, titles_bm25, abstracts_bm25, top_k=5):
     """
     Perform a BM25 search over titles and abstracts and return ranked document indices.
 
@@ -214,9 +226,7 @@ def bm25_search(query, titles_bm25, abstracts_bm25,  top_k=5):
 
     Notes
     -----
-    The combined score is computed as:
-        combined = title_score * 4 + abstract_score
-    giving titles a stronger influence in ranking.
+    The combined score gives titles a stronger influence in ranking.
     """
 
     query = query.lower().split(' ')
@@ -254,7 +264,7 @@ def clickable(df):
     -------
     list of str
         A list of HTML strings where each entry consists of:
-        - a clickable link to the paper’s PDF on arXiv
+        - a clickable link to the paper's PDF on arXiv
         - the paper title
         - the update date (displayed below the link)
 
