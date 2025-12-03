@@ -84,3 +84,6 @@ pip install -r requirements.txt
 ```
 
 Note: It can take a few minutes to upload all libaries
+
+## Recorded Presentation Video
+The Recorded Video can be viewed by clicking on [this link](https://drive.google.com/file/d/1eh0Iqx0EPtWvccPb9iNfreDgtO1urP16/view?usp=drive_link).
