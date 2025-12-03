@@ -19,13 +19,13 @@ Given a text query, the pipeline returns relevant papers ranked by semantic simi
 ├── Searching_Method/
 │   ├── TFIDF.py                  # TF-IDF vector search implementation
 │   ├── BM25andDenseEmbeddings.py # BM25 + dense embedding ranking
-│   ├── Neural_Reranking.py       # Cross-encoder reranking (Final stage)
+│   └── Neural_Reranking.py       # Cross-encoder reranking (Final stage)
 ├── data/                         # Processed metadata + embeddings
 ├── data-preparation/             # Scripts and steps used to filter raw dataset
 ├── visualization.ipynb           # Optional notebook for result analysis
+├── ECE143-Group26-Presentation.pdf  # Project presentation slides
 ├── requirements.txt              # Dependency list
 └── .gitignore                    # Exclusion list for git tracking
-```
 
 ## Dataset Description
 
