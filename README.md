@@ -41,7 +41,10 @@ Relevant fields retained:
 
 Run a query from terminal
 
+```
 python main.py search "attention mechanism"
+```
+
 Example console output:
 
 ```plaintext
@@ -51,6 +54,8 @@ Level 3: Cross-Encoder reranked results
 ```
 
 The top results from all three retrieval modules will be displayed.
+
+Note: It can take upwards of a minute to compute all results
 
 ## Third-Party Dependencies
 
@@ -66,6 +71,7 @@ sentence-transformers
 transformers
 torch
 tqdm
+rank_bm25
 gzip (built-in)
 pickle (built-in)
 json (built-in)
@@ -76,3 +82,5 @@ json (built-in)
 ```bash
 pip install -r requirements.txt
 ```
+
+Note: It can take a few minutes to upload all libaries

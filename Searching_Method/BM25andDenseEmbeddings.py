@@ -276,6 +276,6 @@ def clickable(df):
 
     search_res = []
     for _, row in df.iterrows():
-        search_res.append(f'<a href="https://arxiv.org/pdf/{row['id']}.pdf">{row['title']}</a><br>{row['update_date']}')
+        search_res.append(f'<a href="https://arxiv.org/pdf/{row["id"]}.pdf">{row["title"]}</a><br>{row["update_date"]}')
 
     return search_res
