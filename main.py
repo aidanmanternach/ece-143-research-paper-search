@@ -1,4 +1,4 @@
-import os, sys, nltk
+import os, sys, nltk, time
 from sentence_transformers import SentenceTransformer
 from nltk.corpus import stopwords
 from nltk.stem import SnowballStemmer
@@ -54,14 +54,18 @@ if __name__ == '__main__':
 
 
     # level 1 : TF-IDF
+    
     print('Level 1 : TF-IDF model ')
     tfidf_model = TFIDF(df)
+    t1_start = time.time()
     tfidf_results_df, _ = tfidf_model.search_papers(raw_query, top_n=5)
+    t1_end = time.time()
     for i, (_, row) in enumerate(tfidf_results_df.iterrows(), start=1):
         print(f"{i}. {row['title']}")
         print(f"\thttps://arxiv.org/pdf/{row['id']}.pdf")
         print(f"\t{row['update_date']} (TF-IDF score: {row['relevance_score']:.4f})\n")
-
+    
+    print(f"Level 1 elapsed time: {t1_end - t1_start:.3f} seconds\n")
     # level 2 : BM25 Configuration Variables
     print('Level 2 : BM25 with TF-IDF model ')
     N = len(title_lengths)
@@ -71,8 +75,9 @@ if __name__ == '__main__':
     # Load the split embedding files
     document_embeddings = load_split_embeddings(path)
 
-    
+    t2_start = time.time()
     combined_res = combined_ranking(query, 5, title_term_table, abstract_term_table, title_lengths, abstract_lengths, avg_doc_len_title, avg_doc_len_abs, N, model, document_embeddings)
+    t2_end = time.time()
     paper_idx = [s[0] for s in combined_res]
     res_df = df.iloc[paper_idx]
     i = 1
@@ -82,8 +87,10 @@ if __name__ == '__main__':
         print(f"\t{r['update_date']}\n")
         i += 1
 
+    print(f"Level 2 elapsed time: {t2_end - t2_start:.3f} seconds\n")
     #  level 3 : Neural Reranking with Cross-Encoders
     print("Level 3 : Neural Reranking with Cross-Encoders")
+    t3_start = time.time()
     candidates = combined_ranking(query, 100, title_term_table, abstract_term_table, title_lengths, abstract_lengths, avg_doc_len_title, avg_doc_len_abs, N, model, document_embeddings)
    
     candidates_with_text = []
@@ -100,7 +107,7 @@ if __name__ == '__main__':
         tokenizer_model = "bert-base-uncased",
         cross_encoder_model = "bert-base-uncased"
     )
-
+    t3_end = time.time()
     paper_idx = [s[1] for s in reranked[:5]]
 
     res_df = df.iloc[paper_idx]
@@ -111,3 +118,4 @@ if __name__ == '__main__':
         print(f"\thttps://arxiv.org/pdf/{r['id']}.pdf")
         print(f"\t{r['update_date']}\n")
         i += 1
+    print(f"Level 3 elapsed time: {t3_end - t3_start:.3f} seconds\n")
