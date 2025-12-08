@@ -26,6 +26,7 @@ Given a text query, the pipeline returns relevant papers ranked by semantic simi
 ├── ECE143-Group26-Presentation.pdf  # Project presentation slides
 ├── requirements.txt              # Dependency list
 └── .gitignore                    # Exclusion list for git tracking
+```
 
 ## Dataset Description
 
